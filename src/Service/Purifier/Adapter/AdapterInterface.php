@@ -15,6 +15,8 @@ interface AdapterInterface
 {
     public function payloadValidate($payload);
 
+    public function fetchStatus();
+
     public function getPollutionRate();
 
     public function getTemperature();

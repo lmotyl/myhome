@@ -5,12 +5,22 @@
 # https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
 parameters:
     purifier:
+        config:
+            pro:
+                level_map:
+                    quiet: 1
+                    low: 3
+                    medium: 6
+                    high: 10
+                    very-high: 14
+                    max: 17
         general: 
-            delay: 5
+            delay: 3
             period: 60
         devices:
             - {
                 scenario: 'default', 
+                model: 'pro',
                 adapter: '\App\Service\Purifier\PythonMiio\PythonMiioAdapter',  
                 payload: { 
                     ip: '192.168.8.153',
@@ -19,6 +29,7 @@ parameters:
                 }
             - {
                 scenario: 'default', 
+                model: 'pro',
                 adapter: '\App\Service\Purifier\PythonMiio\PythonMiioAdapter',  
                 payload: { 
                     ip: '192.168.8.155',
@@ -31,15 +42,20 @@ parameters:
 #                adapter: App\Service\Purifier\Adapter\PythonMiioAdapter, 
 #                payload: { ip: '192.168.8.155', token: 'fd523a885c53215dd830b76b46cbe919'} 
 #            }
-#        scenarios:
-#            default:
-#                increasing:
-#                    - { comparison: 'below', pollution: '5', mode: 'auto', level: 'quiet' } 
-#                    - { comparison: 'above', pollution: '5', mode: 'manual', level: 'low' }
-#                    - { comparison: 'above', pollution: '10', mode: 'manual', level: 'medium' }
-#                    - { comparison: 'above', pollution: '15', mode: 'manual', level: 'high' }                    
-#                    - { comparison: 'above', pollution: '25', mode: 'manual', level: 'very-high' }
-#                    - { comparison: 'above', pollution: '30', mode: 'manual', level: 'max' }                    
+        scenarios:
+            default:
+                increasing:
+                    - { pollution: '0',  level: 'quiet' } 
+                    - { pollution: '5',  level: 'low' }
+                    - { pollution: '10', level: 'medium' }
+                    - { pollution: '15', level: 'high' }                    
+                    - { pollution: '25', level: 'very-high' }
+                    - { pollution: '30', level: 'max' }                    
+                decreasing:
+                    - { pollution: '20', level: 'very-high' } 
+                    - { pollution: '15', level: 'medium' }
+                    - { pollution: '5',  level: 'low' }
+                    - { pollution: '2',  level: 'quiet' }                    
                     
 
 services:

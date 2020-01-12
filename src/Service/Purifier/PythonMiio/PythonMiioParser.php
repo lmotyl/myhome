@@ -73,9 +73,9 @@ class PythonMiioParser
 
     public static function getMode($value)
     {
-        return $value;
         switch($value) {
             case 'favorite' : return \App\Service\Purifier\Adapter\Adapter::MODE_MANUAL;
+            case 'silent':
             case 'auto' : return \App\Service\Purifier\Adapter\Adapter::MODE_AUTO;
             default: throw new \Exception(sprintf("Unrecognized mode value: %s", $value));
         }

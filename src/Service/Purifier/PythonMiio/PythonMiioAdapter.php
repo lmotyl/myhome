@@ -21,10 +21,10 @@ class PythonMiioAdapter extends Adapter
         $this->token = $payload['token'] ?? null;
     }
 
-    private function fetchStatus() {
+    public function fetchStatus() {
 
         if ($this->statusFetchedAt >= time()) {
-            return null;
+            return $this->status;
         }
         $this->statusFetchedAt = time();
 
@@ -39,6 +39,8 @@ class PythonMiioAdapter extends Adapter
         if (is_array($output)) {
             $this->status = PythonMiioParser::parse($output);
         }
+
+        return $this->status;
     }
 
     public function payloadValidate($payload)
@@ -59,17 +61,16 @@ class PythonMiioAdapter extends Adapter
 
     public function getLevel()
     {
-        
+        return $this->status[PythonMiioParser::KEY_LEVEL] ?? null;
     }
 
     public function getMode()
     {
-
+        return $this->status[PythonMiioParser::KEY_MODE] ?? null;
     }
 
     public function getPollutionRate()
     {
-        $this->fetchStatus();
         return $this->status[PythonMiioParser::KEY_POLLUTION] ?? null;
     }
 
@@ -90,7 +91,15 @@ class PythonMiioAdapter extends Adapter
 
     public function setLevel($level)
     {
-        
+        $query = sprintf(
+            'miiocli airpurifier --ip %s --token %s set_favorite_level %s',
+            $this->ip,
+            $this->token,
+            $level
+        );
+
+        exec($query, $output);
+
     }
 
     public function setMode($mode)
