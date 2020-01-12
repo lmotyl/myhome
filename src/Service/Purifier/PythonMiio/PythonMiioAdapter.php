@@ -44,6 +44,11 @@ class PythonMiioAdapter extends Adapter
     }
 
 
+    public function getIp()
+    {
+        return $this->ip;
+    }
+
     public function payloadValidate($payload)
     {
         if (\is_null($this->ip)) {

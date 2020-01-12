@@ -130,7 +130,7 @@ class PurifierService
         if (is_null($adapter) || !class_exists($adapter)) {
             throw new \Exception(sprintf('Adapter Class is undefined!'));
         }
-
+        
         $this->purifier = new $adapter($payload);
         $this->initDeviceScenario($scenarioName);
         $this->initDeviceModel($this->devices[$index]['model']);
@@ -144,11 +144,12 @@ class PurifierService
 
     public function execute()
     {
+        print_r("Device ".$this->purifier->getIp()." initialized.");
         while (true) {
             sleep($this->general['delay']);
             $status = $this->purifier->fetchStatus();
             if (false !== $this->purifier->getError()) {
-                print_r([date('Y-m-d H:i:s'), $this->purifier->getError()]);
+                print_r([date('Y-m-d H:i:s'), $this->purifier->getIp(), $this->purifier->getError()]);
                 continue;
             }
 
@@ -156,7 +157,7 @@ class PurifierService
             $powerState = $this->purifier->getPowerState();
 
             if (false === $powerState) {
-                print_r([date('Y-m-d H:i:s'), 'Power Off']);
+                print_r([date('Y-m-d H:i:s'), $this->purifier->getIp(), 'Power Off']);
                 continue;
             }
 
@@ -164,6 +165,7 @@ class PurifierService
             $mode = $this->purifier->getMode();
             $currentLevel = $this->mapLevel($this->purifier->getLevel());
             if (PythonMiio\PythonMiioAdapter::MODE_MANUAL !== $mode) {
+                print_r([date('Y-m-d H:i:s'), $this->purifier->getIp(), 'Device is in mode: '.$mode.". We can handle only in favorite mode."]);
                 continue;
             }
 
@@ -172,7 +174,17 @@ class PurifierService
             $trend = $this->getPollTrend($prevAvg, $currAvg);
 
             $newLevel = $this->getLevelByPollutionRate($currAvg, $trend, $currentLevel);
-            print_r([date('H:i:s'),$pollRate, implode(',', $this->pollMeasure), $prevAvg, $currAvg, $trend, $currentLevel, $newLevel]);
+            print_r([
+                date('H:i:s'),
+                $this->purifier->getIp(),
+                $pollRate,
+                implode(',', $this->pollMeasure),
+                $prevAvg,
+                $currAvg,
+                $trend,
+                $currentLevel,
+                $newLevel
+            ]);
 
             switch ($trend) {
                 case self::TREND_INCREASING:
