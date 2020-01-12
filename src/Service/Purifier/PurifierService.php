@@ -81,7 +81,7 @@ class PurifierService
         foreach ($this->scenario[$trend] as $item) {
             switch ($trend) {
                 case self::TREND_INCREASING:
-                    if ($pollutionRate > (int) $item['pollution']) {
+                    if ($pollutionRate >= (int) $item['pollution']) {
                         $searchLevel = $item['level'];
                     }
                     break;
@@ -105,7 +105,7 @@ class PurifierService
             }
         }
 
-        return (int) (array_sum($this->pollMeasure) / count($this->pollMeasure));
+        return number_format((array_sum($this->pollMeasure) / count($this->pollMeasure)), 2);
     }
 
     public function getPollTrend($prevAvg, $currAvg)
@@ -134,6 +134,16 @@ class PurifierService
         $this->purifier = new $adapter($payload);
         $this->initDeviceScenario($scenarioName);
         $this->initDeviceModel($this->devices[$index]['model']);
+        if ($this->isAvailable()) {
+            $pollRate = $this->purifier->getPollutionRate();
+            $currentLevel = $this->mapLevel($this->purifier->getLevel());
+
+            $currAvg = $this->calculateAvgPollution($pollRate);
+            
+            $newLevel = $this->getLevelByPollutionRate($currAvg, self::TREND_INCREASING, $currentLevel);
+            $this->purifier->setLevel($this->model['level_map'][$newLevel]);
+            print_r("Device ".$this->purifier->getIp()." initialized.");
+        }
     }
 
 
@@ -144,30 +154,15 @@ class PurifierService
 
     public function execute()
     {
-        print_r("Device ".$this->purifier->getIp()." initialized.");
+
         while (true) {
             sleep($this->general['delay']);
-            $status = $this->purifier->fetchStatus();
-            if (false !== $this->purifier->getError()) {
-                print_r([date('Y-m-d H:i:s'), $this->purifier->getIp(), $this->purifier->getError()]);
-                continue;
-            }
-
-           
-            $powerState = $this->purifier->getPowerState();
-
-            if (false === $powerState) {
-                print_r([date('Y-m-d H:i:s'), $this->purifier->getIp(), 'Power Off']);
+            if (false === $this->isAvailable()) {
                 continue;
             }
 
             $pollRate = $this->purifier->getPollutionRate();
-            $mode = $this->purifier->getMode();
             $currentLevel = $this->mapLevel($this->purifier->getLevel());
-            if (PythonMiio\PythonMiioAdapter::MODE_MANUAL !== $mode) {
-                print_r([date('Y-m-d H:i:s'), $this->purifier->getIp(), 'Device is in mode: '.$mode.". We can handle only in favorite mode."]);
-                continue;
-            }
 
             $prevAvg = $this->calculateAvgPollution();
             $currAvg = $this->calculateAvgPollution($pollRate);
@@ -211,6 +206,26 @@ class PurifierService
 
     public function isAvailable()
     {
+        $status = $this->purifier->fetchStatus();
+        if (false !== $this->purifier->getError()) {
+            print_r([date('Y-m-d H:i:s'), $this->purifier->getIp(), $this->purifier->getError()]);
+            return false;
+        }
 
+
+        $powerState = $this->purifier->getPowerState();
+
+        if (false === $powerState) {
+            print_r([date('Y-m-d H:i:s'), $this->purifier->getIp(), 'Power Off']);
+            return false;
+        }
+
+        $mode = $this->purifier->getMode();
+        if (PythonMiio\PythonMiioAdapter::MODE_MANUAL !== $mode) {
+            print_r([date('Y-m-d H:i:s'), $this->purifier->getIp(), 'Device is in mode: '.$mode.". We can handle only in favorite mode."]);
+            return false;
+        }
+
+        return true;
     }
 }

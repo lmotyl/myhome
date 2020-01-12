@@ -108,7 +108,7 @@ class PythonMiioAdapter extends Adapter
             $this->token,
             $level
         );
-
+        print_r($query."\n");
         exec($query, $output);
 
     }
