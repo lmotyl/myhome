@@ -32,14 +32,16 @@ class PurifierCommand extends \Symfony\Component\Console\Command\Command
 
     protected function configure()
     {
-        
+        $this->setName('app:purifier')
+            ->addArgument('device', \Symfony\Component\Console\Input\InputArgument::REQUIRED, 'Index of a device in config');
         // ...
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         // ...
-        $this->purifierService->initAdapter();
+        $deviceIndex = (int) $input->getArgument('device') ?? 0;
+        $this->purifierService->initAdapter($deviceIndex);
         $this->purifierService->execute();
         return 0;
     }
