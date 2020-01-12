@@ -35,4 +35,7 @@ interface AdapterInterface
 
     public function powerOff();
 
+    public function getPowerState();
+
+    public function getError();
 }

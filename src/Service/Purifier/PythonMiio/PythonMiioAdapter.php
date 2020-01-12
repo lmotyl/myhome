@@ -43,6 +43,7 @@ class PythonMiioAdapter extends Adapter
         return $this->status;
     }
 
+
     public function payloadValidate($payload)
     {
         if (\is_null($this->ip)) {
@@ -89,6 +90,11 @@ class PythonMiioAdapter extends Adapter
 
     }
 
+    public function getPowerState()
+    {
+        return $this->status[PythonMiioParser::KEY_POWER] ?? false;
+    }
+
     public function setLevel($level)
     {
         $query = sprintf(
@@ -105,5 +111,9 @@ class PythonMiioAdapter extends Adapter
     public function setMode($mode)
     {
 
+    }
+
+    public function getError() {
+        return $this->status[PythonMiioParser::KEY_ERROR] ?? false;
     }
 }

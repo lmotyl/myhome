@@ -11,6 +11,7 @@ class PythonMiioParser
     const PARSE_HUMIDITY = 'Humidity:';
     const PARSE_MODE = 'Mode:';
     const PARSE_FAVORITE_LEVEL = 'Favorite level:';
+    const PARSE_ERROR = 'Error:';
 
     const KEY_POWER = 'power';
     const KEY_POLLUTION = 'pollution';
@@ -18,6 +19,7 @@ class PythonMiioParser
     const KEY_HUMIDITY = 'humidity';
     const KEY_MODE = 'mode';
     const KEY_LEVEL = 'level';
+    const KEY_ERROR = 'error';
 
     const MAP_PARSER = [
        self::KEY_POWER => self::PARSE_POWER,
@@ -25,7 +27,8 @@ class PythonMiioParser
        self::KEY_TEMPERATURE => self::PARSE_TEMPERATURE,
        self::KEY_HUMIDITY => self::PARSE_HUMIDITY,
        self::KEY_MODE => self::PARSE_MODE,
-       self::KEY_LEVEL => self::PARSE_FAVORITE_LEVEL
+       self::KEY_LEVEL => self::PARSE_FAVORITE_LEVEL,
+       self::KEY_ERROR => self::PARSE_ERROR
     ];
 
     public static function parse($payload)
@@ -45,6 +48,11 @@ class PythonMiioParser
         }
 
         return $out;
+    }
+
+    public static function getError($value)
+    {
+        return $value;
     }
 
     public static function getPower($value)
@@ -85,4 +93,5 @@ class PythonMiioParser
     {
         return (int) $value;
     }
+
 }

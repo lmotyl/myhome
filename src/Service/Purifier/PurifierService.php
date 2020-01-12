@@ -31,7 +31,7 @@ class PurifierService
      */
     private $purifier;
 
-    private $pollMeasure = [0];
+    private $pollMeasure = [];
 
     private $avgItemsLengh;
 
@@ -61,6 +61,9 @@ class PurifierService
         $period = $this->general['period'] ?? 60;
         $interval = $this->general['interval'] ?? 3;
         $this->avgItemsLengh = (int) $period / $interval;
+        for ($i = 0; $i < $this->avgItemsLengh; $i++) {
+            array_push($this->pollMeasure, 0);
+        }
     }
 
     private function initDeviceScenario($scenarioName = 'default') {
@@ -71,9 +74,9 @@ class PurifierService
         $this->model = $this->config[$model];
     }
 
-    private function getLevelByPollutionRate($pollutionRate, $trend)
+    private function getLevelByPollutionRate($pollutionRate, $trend, $currentLevel)
     {
-        $searchLevel = Adapter\Adapter::LEVEL_QUIET;
+        $searchLevel = $currentLevel;
 //        var_dump($this->scenario);
         foreach ($this->scenario[$trend] as $item) {
             switch ($trend) {
@@ -83,7 +86,7 @@ class PurifierService
                     }
                     break;
                 case self::TREND_DECREASING:
-                    if ($pollutionRate < (int) $item['pollution']) {
+                    if ($pollutionRate <= (int) $item['pollution']) {
                         $searchLevel = $item['level'];
                     }
                     break;
@@ -143,7 +146,20 @@ class PurifierService
     {
         while (true) {
             sleep($this->general['delay']);
-            $this->purifier->fetchStatus();
+            $status = $this->purifier->fetchStatus();
+            if (false !== $this->purifier->getError()) {
+                print_r([date('Y-m-d H:i:s'), $this->purifier->getError()]);
+                continue;
+            }
+
+           
+            $powerState = $this->purifier->getPowerState();
+
+            if (false === $powerState) {
+                print_r([date('Y-m-d H:i:s'), 'Power Off']);
+                continue;
+            }
+
             $pollRate = $this->purifier->getPollutionRate();
             $mode = $this->purifier->getMode();
             $currentLevel = $this->mapLevel($this->purifier->getLevel());
@@ -155,8 +171,8 @@ class PurifierService
             $currAvg = $this->calculateAvgPollution($pollRate);
             $trend = $this->getPollTrend($prevAvg, $currAvg);
 
-            $newLevel = $this->getLevelByPollutionRate($currAvg, $trend);
-            print_r([$pollRate, $this->pollMeasure, $prevAvg, $currAvg, $trend, $currentLevel, $newLevel]);
+            $newLevel = $this->getLevelByPollutionRate($currAvg, $trend, $currentLevel);
+            print_r([date('H:i:s'),$pollRate, implode(',', $this->pollMeasure), $prevAvg, $currAvg, $trend, $currentLevel, $newLevel]);
 
             switch ($trend) {
                 case self::TREND_INCREASING:
