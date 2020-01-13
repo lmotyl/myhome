@@ -8,7 +8,8 @@ parameters:
         config:
             pro:
                 level_map:
-                    quiet: 1
+                    quiet: 0
+                    very-low: 1
                     low: 3
                     medium: 7
                     high: 10
@@ -36,27 +37,21 @@ parameters:
                     token: 'fd523a885c53215dd830b76b46cbe919'
                 }
                 }
-
-#            - {
-#                scenario: 'default', 
-#                adapter: App\Service\Purifier\Adapter\PythonMiioAdapter, 
-#                payload: { ip: '192.168.8.155', token: 'fd523a885c53215dd830b76b46cbe919'} 
-#            }
         scenarios:
             default:
                 increasing:
                     - { pollution: '0',  level: 'quiet' } 
-                    - { pollution: '5',  level: 'low' }
+                    - { pollution: '5',  level: 'very-low' }
                     - { pollution: '10', level: 'medium' }
-                    - { pollution: '15', level: 'high' }                    
-                    - { pollution: '25', level: 'very-high' }
+                    - { pollution: '15', level: 'high' }   
+                    - { pollution: '20', level: 'very-high' }
                     - { pollution: '30', level: 'max' }                    
                 decreasing:
                     - { pollution: '20', level: 'very-high' } 
                     - { pollution: '15', level: 'high' }
                     - { pollution: '10', level: 'medium' }
                     - { pollution: '5',  level: 'low' }
-                    - { pollution: '2',  level: 'quiet' }                    
+                    - { pollution: '3',  level: 'quiet' }                    
                     
 
 services:

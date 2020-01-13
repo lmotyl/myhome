@@ -35,6 +35,7 @@ class PurifierService
 
     private $avgItemsLengh;
 
+    private $needStart = true;
 
     public function __construct(
         ParameterBagInterface $params
@@ -134,16 +135,6 @@ class PurifierService
         $this->purifier = new $adapter($payload);
         $this->initDeviceScenario($scenarioName);
         $this->initDeviceModel($this->devices[$index]['model']);
-        if ($this->isAvailable()) {
-            $pollRate = $this->purifier->getPollutionRate();
-            $currentLevel = $this->mapLevel($this->purifier->getLevel());
-
-            $currAvg = $this->calculateAvgPollution($pollRate);
-            
-            $newLevel = $this->getLevelByPollutionRate($currAvg, self::TREND_INCREASING, $currentLevel);
-            $this->purifier->setLevel($this->model['level_map'][$newLevel]);
-            print_r("Device ".$this->purifier->getIp()." initialized.");
-        }
     }
 
 
@@ -152,12 +143,32 @@ class PurifierService
         return $key ?: Adapter\Adapter::LEVEL_QUIET;
     }
 
+    public function start()
+    {
+        if ($this->isAvailable()) {
+            $pollRate = $this->purifier->getPollutionRate();
+            $currAvg = $this->calculateAvgPollution($pollRate);
+            $newLevel = $this->getLevelByPollutionRate($currAvg, self::TREND_INCREASING, Adapter\Adapter::LEVEL_QUIET);
+            $this->purifier->setLevel($this->model['level_map'][$newLevel]);
+            print_r("Device ".$this->purifier->getIp()." started.");
+            $this->needStart = false;
+        } else {
+            $this->needStart = true;
+        }
+    }
+
     public function execute()
     {
 
         while (true) {
             sleep($this->general['delay']);
+
+            if (true === $this->needStart) {
+                $this->start();
+            }
+
             if (false === $this->isAvailable()) {
+                $this->needStart = true;
                 continue;
             }
 
