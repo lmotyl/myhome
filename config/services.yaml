@@ -10,7 +10,7 @@ parameters:
                 level_map:
                     quiet: 1
                     low: 3
-                    medium: 6
+                    medium: 7
                     high: 10
                     very-high: 14
                     max: 17
@@ -53,7 +53,8 @@ parameters:
                     - { pollution: '30', level: 'max' }                    
                 decreasing:
                     - { pollution: '20', level: 'very-high' } 
-                    - { pollution: '15', level: 'medium' }
+                    - { pollution: '15', level: 'high' }
+                    - { pollution: '10', level: 'medium' }
                     - { pollution: '5',  level: 'low' }
                     - { pollution: '2',  level: 'quiet' }                    
                     
