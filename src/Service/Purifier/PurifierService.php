@@ -57,6 +57,11 @@ class PurifierService
 
     }
 
+    private function log($data) {
+        $data = !is_array($data) ? [$data] : $data;
+        echo implod(' - ', $data)."\n";
+    }
+
     private function initAverageParams()
     {
         $period = $this->general['period'] ?? 60;
@@ -195,12 +200,14 @@ class PurifierService
             switch ($trend) {
                 case self::TREND_INCREASING:
                     if ($this->model['level_map'][$newLevel] > $this->model['level_map'][$currentLevel]) {
+                        print_r(['request increase level:', $this->model['level_map'][$currentLevel], $this->model['level_map'][$newLevel]]);
                         $this->purifier->setLevel($this->model['level_map'][$newLevel]);
                     }
 
                     break;
                 case self::TREND_DECREASING:
                     if ($this->model['level_map'][$newLevel] < $this->model['level_map'][$currentLevel]) {
+                        print_r(['request decrease level:', $this->model['level_map'][$currentLevel], $this->model['level_map'][$newLevel]]);
                         $this->purifier->setLevel($this->model['level_map'][$newLevel]);
                     }
 
