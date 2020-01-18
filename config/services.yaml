@@ -11,9 +11,12 @@ parameters:
                     quiet: 0
                     very-low: 1
                     low: 3
+                    medium-low: 5
                     medium: 7
-                    high: 10
-                    very-high: 14
+                    medium-high: 9
+                    high: 11
+                    very-high: 13
+                    almost-max: 15
                     max: 17
         general: 
             delay: 3
@@ -41,15 +44,16 @@ parameters:
             default:
                 increasing:
                     - { pollution: '0',  level: 'quiet' } 
-                    - { pollution: '5',  level: 'very-low' }
+                    - { pollution: '3',  level: 'very-low' }
+                    - { pollution: '5',  level: 'low' }
+                    - { pollution: '7',  level: 'medium-low' }
                     - { pollution: '10', level: 'medium' }
+                    - { pollution: '13', level: 'medium-high' }
                     - { pollution: '15', level: 'high' }   
-                    - { pollution: '20', level: 'very-high' }
-                    - { pollution: '30', level: 'max' }                    
+                    - { pollution: '18', level: 'very-high' }                       
+                    - { pollution: '22', level: 'almost-max' }
+                    - { pollution: '25', level: 'max' }                    
                 decreasing:
-                    - { pollution: '20', level: 'very-high' } 
-                    - { pollution: '15', level: 'high' }
-                    - { pollution: '10', level: 'medium' }
                     - { pollution: '5',  level: 'low' }
                     - { pollution: '3',  level: 'quiet' }                    
                     
