@@ -157,9 +157,7 @@ class PurifierService
             $this->purifier->setLevel($this->model['level_map'][$newLevel]);
             $this->log("Device ".$this->purifier->getIp()." started.");
             $this->needStart = false;
-        } else {
-            $this->needStart = true;
-        }
+        } 
     }
 
     public function execute()
@@ -173,7 +171,6 @@ class PurifierService
             }
 
             if (false === $this->isAvailable()) {
-                $this->needStart = true;
                 continue;
             }
 
@@ -234,12 +231,14 @@ class PurifierService
         $powerState = $this->purifier->getPowerState();
 
         if (false === $powerState) {
+            $this->needStart = true;
             $this->log([date('Y-m-d H:i:s'), $this->purifier->getIp(), 'Power Off']);
             return false;
         }
 
         $mode = $this->purifier->getMode();
         if (PythonMiio\PythonMiioAdapter::MODE_MANUAL !== $mode) {
+            $this->needStart = true;
             $this->log([date('Y-m-d H:i:s'), $this->purifier->getIp(), 'Device is in mode: '.$mode.". We can handle only in favorite mode."]);
             return false;
         }

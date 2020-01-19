@@ -54,8 +54,8 @@ parameters:
                     - { pollution: '22', level: 'almost-max' }
                     - { pollution: '25', level: 'max' }                    
                 decreasing:
-                    - { pollution: '5',  level: 'low' }
-                    - { pollution: '3',  level: 'quiet' }                    
+                    - { pollution: '4',  level: 'low' }
+                    - { pollution: '2',  level: 'quiet' }                    
                     
 
 services:
